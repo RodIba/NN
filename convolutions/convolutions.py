@@ -22,8 +22,8 @@ def convolve(image, K):
 	# loop over the input image, "sliding" the kernel across 
 	# each (x,y)-coordinate from left-to-right and top-to-bottom 
 	
-	for y in np.arange(0, iH + pad):
-		for x in np.arange(0, iW + pad):
+	for y in np.arange(pad, iH + pad):
+		for x in np.arange(pad, iW + pad):
 			# extract the ROI of the image by extracting the 
 			# *center* region of the current (x,y)-coordinates
 			# dimensions
@@ -44,8 +44,8 @@ def convolve(image, K):
 			output[y - pad, x - pad] = k 
 
 	# rescale the output image to be un range [0, 255]
-	output = rescale_intensity(output, in_range(0,255))
-	output = (output * 255).astype("unit8")	
+	output = rescale_intensity(output, in_range = (0,255))
+	output = (output * 255).astype("uint8")	
 	
 	# return the output image
 
@@ -53,7 +53,7 @@ def convolve(image, K):
 
 #construct the argument parser and parse the arguments	
 ap = argparse.ArgumentParser()
-ap.add_argument("-i", "--input", require = True, 
+ap.add_argument("-i", "--image", required = True, 
 	help = "path to the input image")
 args = vars(ap.parse_args())
 
@@ -101,8 +101,8 @@ emboss = np.array((
 
 
 kernelBank = (
-	("small_blurr", smallBlurr),
-	("large_blurr", largeBlurr),
+	("small_blurr", smallBlur),
+	("large_blurr", largeBlur),
 	("sharpen", sharpen),
 	("laplacian", laplacian),
 	("sobel_x", sobelX),
@@ -124,4 +124,10 @@ for (kernelName, K) in kernelBank:
 	opencvOutput = cv2.filter2D(gray, -1, K)
 
 	# show the ouput images
-	
+	cv2.imshow("Original", gray)
+        cv2.imshow("{} - convole".format(kernelName), convolveOutput)
+        cv2.imshow("{} - openCV".format(kernelName), opencvOutput)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+
